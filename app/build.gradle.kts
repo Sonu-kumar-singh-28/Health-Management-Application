@@ -120,6 +120,9 @@ dependencies {
 
     // iText7 (PDF Generation)
     implementation("com.itextpdf:itext7-core:9.6.0")
+    implementation("com.itextpdf:kernel:9.6.0")
+    implementation("com.itextpdf:layout:9.6.0")
+    implementation("com.itextpdf:io:9.6.0")
 
     // Testing (Manual Configuration)
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -128,4 +131,6 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    // Version aap apne project ke hisab se latest use kar sakte hain (e.g., 0.6.0 ya 0.4.0)
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0")
 }
