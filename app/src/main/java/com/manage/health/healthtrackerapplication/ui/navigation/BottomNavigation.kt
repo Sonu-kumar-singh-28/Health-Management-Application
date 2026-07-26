@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.manage.health.healthtrackerapplication.ui.theme.HealthBlue
@@ -116,12 +117,14 @@ fun BottomNavigation(currentRoute: String, onNavigate:(String)-> Unit){
     )
 
     Box(modifier =
-        Modifier.fillMaxWidth()
+        Modifier
+            .fillMaxWidth()
             .height(80.dp)
             .padding(
                 bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             )
-            .shadow(elevation = 8.dp,
+            .shadow(
+                elevation = 8.dp,
                 shape = RoundedCornerShape(16.dp, topEnd = 16.dp),
                 ambientColor = Color.Black.copy(0.1F),
                 spotColor = Color.Black.copy(0.1f)
@@ -130,7 +133,8 @@ fun BottomNavigation(currentRoute: String, onNavigate:(String)-> Unit){
             .background(Color.White)
     ){
 
-        Row(modifier = Modifier.fillMaxSize()
+        Row(modifier = Modifier
+            .fillMaxSize()
             .padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
@@ -140,8 +144,9 @@ fun BottomNavigation(currentRoute: String, onNavigate:(String)-> Unit){
                 val isSelected = currentRoute == screen.route
                 Column(horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.weight(1f)
-                        .clickable{
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable {
                             onNavigate(screen.route)
                         }
                         .padding(vertical = 8.dp)
@@ -183,5 +188,12 @@ fun BottomNavigation(currentRoute: String, onNavigate:(String)-> Unit){
     }
 }
 
-
+@Preview
+@Composable
+private fun BottomNavigationBarPrev() {
+    BottomNavigation(
+        currentRoute = Screen.Dashboard.route,
+        onNavigate = {}
+    )
+}
 

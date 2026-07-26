@@ -7,6 +7,8 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+apply(plugin = "dagger.hilt.android.plugin")
+
 android {
     namespace = "com.manage.health.healthtrackerapplication"
     compileSdk  = 37
