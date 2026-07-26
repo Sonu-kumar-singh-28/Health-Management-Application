@@ -295,13 +295,13 @@ class GoogleFitService(private val context: Context) {
     /**
      * Pulls data mapping parameters for kinetic energy output readings.
      */
-    suspend fun getTodayCalories(): Float = withContext(Dispatchers.IO) {
+    suspend fun getTodayCalories(): Int = withContext(Dispatchers.IO) {
         Log.d(TAG, "getTodayCalories operational task mapping dispatched.")
         try {
             val account = GoogleSignIn.getLastSignedInAccount(context)
             if (account == null || !GoogleSignIn.hasPermissions(account, fitnessOptions)) {
                 Log.w(TAG, "getTodayCalories execution context terminated prematurely. Checks failed.")
-                return@withContext 0f
+                return@withContext 0
             }
 
             val calendar = Calendar.getInstance()
@@ -312,45 +312,58 @@ class GoogleFitService(private val context: Context) {
             calendar.set(Calendar.MILLISECOND, 0)
             val startTime = calendar.timeInMillis
 
+            // Aggregation Request for Total Day Calories
             val readRequest = DataReadRequest.Builder()
-                .read(DataType.TYPE_CALORIES_EXPENDED)
+                .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+                .bucketByTime(1, TimeUnit.DAYS)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build()
 
             val response = Tasks.await(Fitness.getHistoryClient(context, account).readData(readRequest))
-            var aggregatedCalories = 0f
+            var totalCalories = 0f
 
-            for (dataSet in response.dataSets) {
-                aggregatedCalories += parseAndSumDataSetFloatValues(dataSet, Field.FIELD_CALORIES.name)
+            // Extract value from aggregated buckets
+            for (bucket in response.buckets) {
+                val dataSet = bucket.getDataSet(DataType.AGGREGATE_CALORIES_EXPENDED)
+                if (dataSet != null) {
+                    for (dataPoint in dataSet.dataPoints) {
+                        for (field in dataPoint.dataType.fields) {
+                            if (field.name == Field.FIELD_CALORIES.name) {
+                                totalCalories += dataPoint.getValue(field).asFloat()
+                            }
+                        }
+                    }
+                }
             }
 
-            Log.i(TAG, "getTodayCalories calculation analysis pass: Completed with sum metric yielding: $aggregatedCalories kcal.")
-            return@withContext aggregatedCalories
+            val finalCalories = totalCalories.toInt()
+            Log.i(TAG, "getTodayCalories calculation analysis pass: Completed with sum metric yielding: $finalCalories kcal.")
+            return@withContext finalCalories
+
         } catch (e: Exception) {
             Log.e(TAG, "Fatal parsing tracking data loop mapping block interruption inside getTodayCalories context", e)
-            return@withContext 0f
+            return@withContext 0
         }
     }
 
     /**
      * Dispatches historical network inquiries looking for specific cardiovascular pulse data array.
      */
-    suspend fun getLatestHeartRate(): Float = withContext(Dispatchers.IO) {
+    suspend fun getLatestHeartRate(): Int = withContext(Dispatchers.IO) {
         Log.d(TAG, "getLatestHeartRate request processing pipe started running.")
         try {
             val account = GoogleSignIn.getLastSignedInAccount(context)
             if (account == null || !GoogleSignIn.hasPermissions(account, fitnessOptions)) {
                 Log.w(TAG, "getLatestHeartRate structural execution cancelled. Invalid session credentials permissions profile setup.")
-                return@withContext 0f
+                return@withContext 0
             }
 
             val endTime = System.currentTimeMillis()
-            val startTime = endTime - TimeUnit.DAYS.toMillis(1) // Scanning maximum back threshold constraint parameter boundary.
+            val startTime = endTime - TimeUnit.DAYS.toMillis(1) // Last 24 hours
 
             val readRequest = DataReadRequest.Builder()
                 .read(DataType.TYPE_HEART_RATE_BPM)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                .setLimit(1) // Ensure only the single latest captured metric element matches.
                 .build()
 
             val response = Tasks.await(Fitness.getHistoryClient(context, account).readData(readRequest))
@@ -358,22 +371,22 @@ class GoogleFitService(private val context: Context) {
 
             for (dataSet in response.dataSets) {
                 if (!dataSet.isEmpty) {
+                    // Iterating through dataPoints to extract the latest value
                     for (dataPoint in dataSet.dataPoints) {
-                        for (field in dataPoint.dataType.fields) {
-                            if (field.name == Field.FIELD_BPM.name) {
-                                structuralHeartRateReadingValue = dataPoint.getValue(field).asFloat()
-                                Log.d(TAG, "Located single matching modern record pulse reading context output value: $structuralHeartRateReadingValue")
-                            }
+                        if (dataPoint.dataType == DataType.TYPE_HEART_RATE_BPM) {
+                            structuralHeartRateReadingValue = dataPoint.getValue(Field.FIELD_BPM).asFloat()
                         }
                     }
                 }
             }
 
             Log.i(TAG, "getLatestHeartRate complete loop parsing trace processing yield: $structuralHeartRateReadingValue bpm.")
-            return@withContext structuralHeartRateReadingValue
+
+            // Return as Int to match return type signature
+            return@withContext structuralHeartRateReadingValue.toInt()
         } catch (e: Exception) {
             Log.e(TAG, "Exception captured inside context execution tree loop for parsing getLatestHeartRate structural nodes.", e)
-            return@withContext 0f
+            return@withContext 0
         }
     }
 

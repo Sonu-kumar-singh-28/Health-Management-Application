@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.manage.health.healthtrackerapplication"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -133,4 +133,5 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     // Version aap apne project ke hisab se latest use kar sakte hain (e.g., 0.6.0 ya 0.4.0)
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0")
+    implementation("androidx.compose.material:material-icons-extended")
 }

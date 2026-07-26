@@ -138,7 +138,7 @@ object DataBaseModule {
     @Provides
     @Singleton
     fun provideThemeViewModel(@ApplicationContext context: Context): ThemeViewModel {
-        return ThemeViewModel()
+        return ThemeViewModel(context)
     }
 
 
